@@ -30,11 +30,17 @@ int main(void)
 {
     VM vm;
     initVM(&vm);
-    addInstruction(&vm, OP_LDC, 2, R0, 2);
+    addInstruction(&vm, OP_LDC, 2, R0, 3);
     addInstruction(&vm, OP_LDC, 2, R1, 10);
     addInstruction(&vm, OP_MUL, 3, R0, R0, R1);
     addInstruction(&vm, OP_LDC, 2, R1, 2);
     addInstruction(&vm, OP_DIV, 3, R0, R0, R1);
+    addInstruction(&vm, OP_LDC, 2, R2, 21);
+    addInstruction(&vm, OP_LDC, 2, R3, 1);
+    addInstruction(&vm, OP_SUB, 3, R2, R2, R3);
+    addInstruction(&vm, OP_CMP, 2, R2, R0);
+    addInstruction(&vm, OP_BNN, 1, 28);
+    addInstruction(&vm, OP_MOV, 2, R2, R0);
     addInstruction(&vm, OP_RET, 1, 0);
     printf("Instructions:\n");
     for (int i = 0; i < vm.size; ++i) printByte(vm.code[i]);
