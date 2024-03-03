@@ -41,7 +41,7 @@ typedef enum {
 } OpCode;
 
 enum {
-    CMPNONE = -1,
+    CMPNONE = 2,
     CMPPOS = 1,
     CMPNEG = 0,
 };
