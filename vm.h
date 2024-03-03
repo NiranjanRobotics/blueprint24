@@ -24,7 +24,7 @@ enum {
 };
 
 typedef enum {
-    OP_LDC,
+    OP_LDC = 0,
     OP_MOV,
     OP_ADD,
     OP_SUB,
@@ -34,14 +34,16 @@ typedef enum {
     OP_BNP,
     OP_BNN,
     OP_JMP,
+    OP_AND,
+    OP_NOT,
     OP_NONE,
     OP_RET,
 } OpCode;
 
 enum {
-    CMPNONE,
-    CMPPOS,
-    CMPNEG
+    CMPNONE = -1,
+    CMPPOS = 1,
+    CMPNEG = 0,
 };
 
 typedef struct {
@@ -52,5 +54,6 @@ typedef struct {
 
 void initVM(VM *vm);
 void addInstruction(VM *vm, OpCode op_code, int args, ...);
+uint16_t run(VM *vm);
 
 #endif

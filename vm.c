@@ -48,13 +48,100 @@ void addInstruction(VM *vm, OpCode op_code, int args, ...)
             addByte(vm, arg1);
             addByte(vm, arg2);
         }; break;
-        default: {
+        default:
+        {
             ERROR("Too many arguments for instruction.");
         }; break;
     }
 }
 
-inline static uint8_t nextByte(VM *vm) {
+static inline uint8_t nextByte(VM *vm)
+{
     vm->reg[RPC]++;
     return vm->code[vm->reg[RPC - 1]];
+}
+
+static inline printRegisters(VM *vm)
+{
+    printf("[ ");
+    for (int i = 0; i < NUM_REGISTERS; i++) printf("%d ", vm->reg[i]);
+    printf(" ]\n");
+}
+
+uint16_t run(VM *vm)
+{
+    #define DEBUG true
+    #define BINARY(op, arg1, arg2, arg3, name) \
+        do \
+        { \
+            if (DEBUG) printf("OP_%s [%d] %d %d\n", name, arg1, arg2, arg3); \
+            vm->reg[arg1] = vm->reg[arg2] op vm->reg[arg3]; \
+        } \
+        while (false); \
+
+    while (true)
+    {
+        OpCode op = nextByte(vm);
+        uint8_t arg1 = nextByte(vm);
+        uint8_t arg2 = nextByte(vm);
+        uint8_t arg3 = nextByte(vm);
+
+        switch (op)
+        {
+            case OP_LDC:
+            {
+                vm->reg[arg1] = (arg2 << 8) | arg3;
+                if (DEBUG) printf("OP_LDC [%d] %d\n", arg1, ((arg2 << 8) | arg3));
+            }; break;
+            case OP_MOV:
+            {
+                vm->reg[arg1] = vm->reg[(arg2 << 8) | arg3];
+                if (DEBUG) printf("OP_MOV [%d] %d\n", arg1, ((arg2 << 8) | arg3));
+            }; break;
+            case OP_ADD: BINARY(+, arg1, arg2, arg3, "ADD"); break;
+            case OP_SUB: BINARY(-, arg1, arg2, arg3, "SUB"); break;
+            case OP_MUL: BINARY(*, arg1, arg2, arg3, "MUL"); break;
+            case OP_DIV: BINARY(/, arg1, arg2, arg3, "DIV"); break;
+            case OP_AND: BINARY(&, arg1, arg2, arg3, "AND"); break;
+            case OP_NOT:
+            {
+                vm->reg[arg1] = ~(vm->reg[(arg2 << 8) | arg3]);
+                if (DEBUG) printf("OP_NOT [%d] %d\n", arg1, ((arg2 << 8) | arg3));
+            }; break;
+            case OP_CMP:
+            {
+                vm->reg[RCOMP] = (vm->reg[arg1] == vm->reg[(arg2 << 8) | arg3])? CMPPOS : CMPNEG;
+                if (DEBUG) printf("OP_CMP %d %d\n", arg1, (arg2 << 8 | arg3));
+            }; break;
+            case OP_JMP:
+            {
+                int steps = (arg1 << 16) | (arg2 << 8) | arg3;
+                vm->reg[RPC] += steps;
+                if (DEBUG) printf("OP_JMP %d\n", arg1, arg2, arg3);
+            }; break;
+            case OP_BNP:
+            {
+                int pos = (arg1 << 16) | (arg2 << 8) | arg3;
+                if (vm->reg[RCOMP] == CMPPOS) vm->reg[RPC] == pos;
+                if (DEBUG) printf("OP_BNP %d\n", pos);
+            }; break;
+            case OP_BNN:
+            {
+                int pos = (arg1 << 16) | (arg2 << 8) | arg3;
+                if (vm->reg[RCOMP] == CMPNEG) vm->reg[RPC] == pos;
+                if (DEBUG) printf("OP_BNN %d\n", pos);
+            }; break;
+            case OP_NONE: if (DEBUG) printf("OP_NONE\n"); break;
+            case OP_RET:
+            {
+                if (DEBUG) printf("OP_RET\n");
+                return vm->reg[R0];
+            }
+        }
+
+        if (DEBUG) printRegisters(vm);
+    }
+
+    #undef DEBUG
+    #undef BINARY
 }
