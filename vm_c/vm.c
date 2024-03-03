@@ -70,7 +70,7 @@ static inline void printRegisters(VM *vm)
 {
     printf("[ ");
     for (int i = 0; i < NUM_REGISTERS; i++) printf("%d ", vm->reg[i]);
-    printf(" ]\n");
+    printf("]\n");
 }
 
 uint16_t run(VM *vm)
