@@ -25,6 +25,7 @@ void addInstruction(VM *vm, OpCode op_code, int args, ...)
         case 1:
         {
             int arg = va_arg(va_args, int);
+            if (arg < 0) ERROR("Argument must be a positive integer.");
             uint8_t bytes[3] = {(arg & 0xFF0000) >> 16, (arg & 0xFF00) >> 8, arg & 0xFF};
             addByte(vm, bytes[0]);
             addByte(vm, bytes[1]);
@@ -34,8 +35,10 @@ void addInstruction(VM *vm, OpCode op_code, int args, ...)
         case 2:
         {
             uint8_t dest = va_arg(va_args, int);
+            if (dest < 0) ERROR("Argument must be a positive integer.");
             addByte(vm, dest);
             int arg = va_arg(va_args, int);
+            if (arg < 0) ERROR("Argument must be a positive integer.");
             uint8_t bytes[2] = {(arg & 0xFF00) >> 8, arg & 0xFF};
             addByte(vm, bytes[0]);
             addByte(vm, bytes[1]);
@@ -46,6 +49,9 @@ void addInstruction(VM *vm, OpCode op_code, int args, ...)
             uint8_t dest = va_arg(va_args, int);
             uint8_t arg1 = va_arg(va_args, int);
             uint8_t arg2 = va_arg(va_args, int);
+            if (dest < 0) ERROR("Argument must be a positive integer.");
+            if (arg1 < 0) ERROR("Argument must be a positive integer.");
+            if (arg2 < 0) ERROR("Argument must be a positive integer.");
             addByte(vm, dest);
             addByte(vm, arg1);
             addByte(vm, arg2);
